@@ -18,6 +18,55 @@ const database = require("./database");
 const app = express();
 
 app.use(morgan("common"));
+app.use(express.json());
+
+// Initialize database table
+database.schema.hasTable('todos').then(exists => {
+  if (!exists) {
+    return database.schema.createTable('todos', table => {
+      table.increments('id').primary();
+      table.string('task').notNullable();
+      table.boolean('completed').defaultTo(false);
+    });
+  }
+});
+
+app.get("/todos", function(req, res, next) {
+  database('todos').select('*')
+    .then(todos => res.json(todos))
+    .catch(next);
+});
+
+app.post("/todos", function(req, res, next) {
+  const { task } = req.body;
+  if (!task) {
+    return res.status(400).json({ error: 'Task is required' });
+  }
+  database('todos').insert({ task })
+    .then(([id]) => res.status(201).json({ id, task, completed: false }))
+    .catch(next);
+});
+
+app.put("/todos/:id", function(req, res, next) {
+  const { id } = req.params;
+  const { task, completed } = req.body;
+  database('todos').where({ id }).update({ task, completed })
+    .then(count => {
+      if (count === 0) return res.status(404).end();
+      res.json({ id, task, completed });
+    })
+    .catch(next);
+});
+
+app.delete("/todos/:id", function(req, res, next) {
+  const { id } = req.params;
+  database('todos').where({ id }).del()
+    .then(count => {
+      if (count === 0) return res.status(404).end();
+      res.status(204).end();
+    })
+    .catch(next);
+});
 
 app.get("/", function(req, res, next) {
   database.raw('select VERSION() version')

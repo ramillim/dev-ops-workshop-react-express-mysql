@@ -27,7 +27,9 @@ services:
       - public
       - private
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+        restart: true
   db:
     # We use a mariadb image which supports both amd64 & arm64 architecture
     image: mariadb:11.8.6-noble
@@ -44,6 +46,12 @@ services:
     environment:
       - MYSQL_DATABASE=example
       - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db-password
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
   frontend:
     build:
       context: frontend

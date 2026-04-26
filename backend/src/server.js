@@ -20,18 +20,8 @@ const app = express();
 app.use(morgan("common"));
 app.use(express.json());
 
-// Initialize database table
-database.schema.hasTable('todos').then(exists => {
-  if (!exists) {
-    return database.schema.createTable('todos', table => {
-      table.increments('id').primary();
-      table.string('task').notNullable();
-      table.boolean('completed').defaultTo(false);
-      table.timestamp('completed_at').nullable();
-      table.timestamp('due_date').nullable();
-    });
-  }
-});
+// Initialize database migrations
+database.migrate.latest();
 
 app.get("/todos", function(req, res, next) {
   database('todos').select('*')

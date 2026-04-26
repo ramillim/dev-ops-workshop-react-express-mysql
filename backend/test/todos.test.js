@@ -8,21 +8,10 @@ chai.should();
 
 describe("Todos API", () => {
   before(async () => {
-    // Ensure table exists
-    const exists = await database.schema.hasTable('todos');
-    if (!exists) {
-      await database.schema.createTable('todos', table => {
-        table.increments('id').primary();
-        table.string('task').notNullable();
-        table.boolean('completed').defaultTo(false);
-        table.timestamp('completed_at').nullable();
-        table.timestamp('due_date').nullable();
-      });
-    } else {
-        // If it exists but we just updated it, we might need to add columns
-        // but for a simple test let's just clear it
-        await database('todos').truncate();
-    }
+    // Run migrations to ensure table exists
+    await database.migrate.latest();
+    // Clear table
+    await database('todos').truncate();
   });
 
   it("should add a new todo with due_date", (done) => {

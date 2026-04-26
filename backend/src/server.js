@@ -14,6 +14,13 @@ const morgan = require("morgan");
 
 const database = require("./database");
 
+const formatDate = (date) => {
+  if (!date) return null;
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return null;
+  return d.toISOString().slice(0, 19).replace('T', ' ');
+};
+
 // Appi
 const app = express();
 
@@ -34,8 +41,9 @@ app.post("/todos", function(req, res, next) {
   if (!task) {
     return res.status(400).json({ error: 'Task is required' });
   }
-  database('todos').insert({ task, due_date })
-    .then(([id]) => res.status(201).json({ id, task, completed: false, due_date, completed_at: null }))
+  const formattedDueDate = formatDate(due_date);
+  database('todos').insert({ task, due_date: formattedDueDate })
+    .then(([id]) => res.status(201).json({ id, task, completed: false, due_date: formattedDueDate, completed_at: null }))
     .catch(next);
 });
 
@@ -43,10 +51,10 @@ app.put("/todos/:id", function(req, res, next) {
   const { id } = req.params;
   const { task, completed, due_date } = req.body;
   
-  const updateData = { task, completed, due_date };
+  const updateData = { task, completed, due_date: formatDate(due_date) };
   
   if (completed) {
-    updateData.completed_at = new Date();
+    updateData.completed_at = formatDate(new Date());
   } else {
     updateData.completed_at = null;
   }

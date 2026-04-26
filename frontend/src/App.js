@@ -73,44 +73,55 @@ function App() {
             Add
           </button>
         </form>
-        <ul style={{ listStyle: "none", padding: 0 }}>
-          {todos.map((todo) => (
-            <li key={todo.id} style={{ margin: "10px 0", textAlign: "left" }}>
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <span
+        <table style={{ marginTop: "20px", borderCollapse: "collapse", width: "80%", fontSize: "18px" }}>
+          <thead>
+            <tr style={{ borderBottom: "1px solid #61dafb" }}>
+              <th style={{ padding: "10px", textAlign: "left" }}>Task</th>
+              <th style={{ padding: "10px", textAlign: "left" }}>Status</th>
+              <th style={{ padding: "10px", textAlign: "left" }}>Due Date</th>
+              <th style={{ padding: "10px", textAlign: "left" }}>Completed At</th>
+              <th style={{ padding: "10px", textAlign: "left" }}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {todos.map((todo) => (
+              <tr key={todo.id} style={{ borderBottom: "1px solid #444" }}>
+                <td
                   style={{
+                    padding: "10px",
                     textDecoration: todo.completed ? "line-through" : "none",
-                    flexGrow: 1,
-                    marginRight: "20px"
                   }}
                 >
                   {todo.task}
-                </span>
-                <div style={{ fontSize: "14px", marginRight: "20px" }}>
-                  {todo.due_date && (
-                    <div>Due: {new Date(todo.due_date).toLocaleString()}</div>
+                </td>
+                <td style={{ padding: "10px" }}>
+                  {todo.completed ? (
+                    <span style={{ color: "#4caf50" }}>Completed</span>
+                  ) : (
+                    <span style={{ color: "#ff9800" }}>In Progress</span>
                   )}
-                  {todo.completed_at && (
-                    <div>Completed: {new Date(todo.completed_at).toLocaleString()}</div>
+                </td>
+                <td style={{ padding: "10px" }}>
+                  {todo.due_date ? new Date(todo.due_date).toLocaleString() : "-"}
+                </td>
+                <td style={{ padding: "10px" }}>
+                  {todo.completed_at ? new Date(todo.completed_at).toLocaleString() : "-"}
+                </td>
+                <td style={{ padding: "10px" }}>
+                  {!todo.completed && (
+                    <button
+                      onClick={() => toggleTodo(todo)}
+                      style={{ marginRight: "10px" }}
+                    >
+                      Complete
+                    </button>
                   )}
-                </div>
-                {!todo.completed && (
-                  <button
-                    onClick={() => toggleTodo(todo)}
-                    style={{ marginRight: "10px" }}
-                  >
-                    Complete
-                  </button>
-                )}
-                <button
-                  onClick={() => deleteTodo(todo.id)}
-                >
-                  Delete
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+                  <button onClick={() => deleteTodo(todo.id)}>Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </header>
     </div>
   );

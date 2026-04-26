@@ -27,6 +27,8 @@ database.schema.hasTable('todos').then(exists => {
       table.increments('id').primary();
       table.string('task').notNullable();
       table.boolean('completed').defaultTo(false);
+      table.timestamp('completed_at').nullable();
+      table.timestamp('due_date').nullable();
     });
   }
 });
@@ -38,22 +40,32 @@ app.get("/todos", function(req, res, next) {
 });
 
 app.post("/todos", function(req, res, next) {
-  const { task } = req.body;
+  const { task, due_date } = req.body;
   if (!task) {
     return res.status(400).json({ error: 'Task is required' });
   }
-  database('todos').insert({ task })
-    .then(([id]) => res.status(201).json({ id, task, completed: false }))
+  database('todos').insert({ task, due_date })
+    .then(([id]) => res.status(201).json({ id, task, completed: false, due_date, completed_at: null }))
     .catch(next);
 });
 
 app.put("/todos/:id", function(req, res, next) {
   const { id } = req.params;
-  const { task, completed } = req.body;
-  database('todos').where({ id }).update({ task, completed })
+  const { task, completed, due_date } = req.body;
+  
+  const updateData = { task, completed, due_date };
+  
+  if (completed) {
+    updateData.completed_at = new Date();
+  } else {
+    updateData.completed_at = null;
+  }
+
+  database('todos').where({ id }).update(updateData)
     .then(count => {
       if (count === 0) return res.status(404).end();
-      res.json({ id, task, completed });
+      database('todos').where({ id }).first()
+        .then(todo => res.json(todo));
     })
     .catch(next);
 });

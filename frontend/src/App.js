@@ -4,6 +4,7 @@ import "./App.css";
 function App() {
   const [todos, setTodos] = useState([]);
   const [task, setTask] = useState("");
+  const [dueDate, setDueDate] = useState("");
 
   useEffect(() => {
     fetch("/api/todos")
@@ -18,12 +19,13 @@ function App() {
     fetch("/api/todos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ task }),
+      body: JSON.stringify({ task, due_date: dueDate || null }),
     })
       .then((res) => res.json())
       .then((newTodo) => {
         setTodos([...todos, newTodo]);
         setTask("");
+        setDueDate("");
       })
       .catch(console.error);
   };
@@ -61,28 +63,51 @@ function App() {
             placeholder="Add a new task"
             style={{ fontSize: "20px", padding: "10px" }}
           />
-          <button type="submit" style={{ fontSize: "20px", padding: "10px" }}>
+          <input
+            type="datetime-local"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+            style={{ fontSize: "20px", padding: "10px", marginLeft: "10px" }}
+          />
+          <button type="submit" style={{ fontSize: "20px", padding: "10px", marginLeft: "10px" }}>
             Add
           </button>
         </form>
         <ul style={{ listStyle: "none", padding: 0 }}>
           {todos.map((todo) => (
-            <li key={todo.id} style={{ margin: "10px 0" }}>
-              <span
-                onClick={() => toggleTodo(todo)}
-                style={{
-                  textDecoration: todo.completed ? "line-through" : "none",
-                  cursor: "pointer",
-                }}
-              >
-                {todo.task}
-              </span>
-              <button
-                onClick={() => deleteTodo(todo.id)}
-                style={{ marginLeft: "10px" }}
-              >
-                Delete
-              </button>
+            <li key={todo.id} style={{ margin: "10px 0", textAlign: "left" }}>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <span
+                  style={{
+                    textDecoration: todo.completed ? "line-through" : "none",
+                    flexGrow: 1,
+                    marginRight: "20px"
+                  }}
+                >
+                  {todo.task}
+                </span>
+                <div style={{ fontSize: "14px", marginRight: "20px" }}>
+                  {todo.due_date && (
+                    <div>Due: {new Date(todo.due_date).toLocaleString()}</div>
+                  )}
+                  {todo.completed_at && (
+                    <div>Completed: {new Date(todo.completed_at).toLocaleString()}</div>
+                  )}
+                </div>
+                {!todo.completed && (
+                  <button
+                    onClick={() => toggleTodo(todo)}
+                    style={{ marginRight: "10px" }}
+                  >
+                    Complete
+                  </button>
+                )}
+                <button
+                  onClick={() => deleteTodo(todo.id)}
+                >
+                  Delete
+                </button>
+              </div>
             </li>
           ))}
         </ul>

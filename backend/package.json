@@ -5,6 +5,10 @@
   "description": "TODO List example app backend",
   "author": "",
   "main": "src/index.js",
+  "engines" : {
+    "npm" : "11.12.1",
+    "node" : "24.15.0"
+  },
   "scripts": {
     "start": "node src/index.js",
     "start-watch": "nodemon src/index.js --inspect=0.0.0.0:9229",

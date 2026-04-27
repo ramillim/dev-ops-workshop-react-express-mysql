@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set test database password in file
-        run: echo "test_password" > ../db/password.txt
+        run: echo "test_password" > ./db/password.txt
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:

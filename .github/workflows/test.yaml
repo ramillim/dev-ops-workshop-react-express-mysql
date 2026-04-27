@@ -29,6 +29,8 @@ jobs:
       - name: Install dependencies
         working-directory: backend
         run: npm ci
+      - name: Create DB test password file
+        run: echo "test_password" > backend/db_password.txt
       - name: Run database migrations
         working-directory: backend
         env:
@@ -46,7 +48,7 @@ jobs:
           DATABASE_PORT: 3306
           DATABASE_DB: todos_test
           DATABASE_USER: test_user
-          DATABASE_PASSWORD: test_password
+          DATABASE_PASSWORD: ./db_password.txt
           NODE_ENV: test
         run: npm test
 

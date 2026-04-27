@@ -54,7 +54,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>TODO List</h1>
+        <h1>Trivial TODO List</h1>
         <form onSubmit={addTodo}>
           <input
             type="text"

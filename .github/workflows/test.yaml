@@ -8,8 +8,8 @@ jobs:
   backend-test:
     runs-on: ubuntu-latest
     services:
-      mysql:
-        image: mysql:8.0
+      db:
+        image: mariadb:11.8.6-noble
         env:
           MYSQL_ROOT_PASSWORD: root_password
           MYSQL_DATABASE: todos_test
@@ -29,8 +29,16 @@ jobs:
       - name: Install dependencies
         working-directory: backend
         run: npm ci
-      - name: Create password file
-        run: echo "test_password" > backend/db_password.txt
+      - name: Run database migrations
+        working-directory: backend
+        env:
+          DATABASE_HOST: 127.0.0.1
+          DATABASE_PORT: 3306
+          DATABASE_DB: todos_test
+          DATABASE_USER: test_user
+          DATABASE_PASSWORD: test_password
+          NODE_ENV: test
+        run: npm run migrate
       - name: Run tests
         working-directory: backend
         env:
@@ -38,7 +46,7 @@ jobs:
           DATABASE_PORT: 3306
           DATABASE_DB: todos_test
           DATABASE_USER: test_user
-          DATABASE_PASSWORD: ./db_password.txt
+          DATABASE_PASSWORD: test_password
           NODE_ENV: test
         run: npm test
 

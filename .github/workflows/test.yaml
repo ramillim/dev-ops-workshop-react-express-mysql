@@ -14,12 +14,14 @@ jobs:
           MYSQL_ROOT_PASSWORD: root_password
           MYSQL_DATABASE: todos_test
           MYSQL_USER: test_user
-          MYSQL_PASSWORD: db-btf5q
+          MYSQL_PASSWORD: test_password
         ports:
           - 3306:3306
         options: --health-cmd="healthcheck.sh --connect --innodb_initialized" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
       - uses: actions/checkout@v4
+      - name: Set test database password in file
+        run: echo "test_password" > ../db/password.txt
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:

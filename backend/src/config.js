@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-const readFileSync = filename => fs.readFileSync(filename).toString("utf8");
+const readFileSync = filename => fs.readFileSync(filename).toString();
 
 // Constants
 module.exports = {

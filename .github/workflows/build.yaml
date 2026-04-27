@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run tests
-        uses: .github/workflows/test.yaml
+        uses: ./.github/workflows/test.yaml
 
   build-docker:
     needs: tests
